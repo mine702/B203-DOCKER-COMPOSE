@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3"
 services:
   frontend:
     image: mine0702/docker-frontend
