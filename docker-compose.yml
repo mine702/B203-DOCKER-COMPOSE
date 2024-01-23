@@ -1,14 +1,5 @@
 version: "3"
 services:
-  frontend:
-    image: mine0702/docker-frontend
-    container_name: app_frontend
-    volumes:
-      - /app/node_modules
-      - ./frontend:/app
-    stdin_open: true
-    mem_limit: 128m
-
   nginx:
     restart: always
     image: mine0702/docker-nginx
@@ -21,6 +12,31 @@ services:
     depends_on:
       - frontend
       - backend
+    networks:
+      - backbone
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - /letsencrypt/certbot/conf:/etc/letsencrypt
+      - /letsencrypt/certbot/www:/var/www/certbot
+    depends_on:
+      - nginx
+    networks:
+      - backbone
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  frontend:
+    image: mine0702/docker-frontend
+    container_name: app_frontend
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    stdin_open: true
+    mem_limit: 128m
 
   backend:
     image: mine0702/docker-backend
