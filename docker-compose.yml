@@ -4,12 +4,14 @@ services:
     restart: always
     image: mine0702/docker-nginx
     container_name: app_nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     ports:
       - "80:80"
       - "443:443" # HTTPS 포트 추가
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
-      - ./nginx-config:/etc/nginx/conf.d
     depends_on:
       - frontend
       - backend
