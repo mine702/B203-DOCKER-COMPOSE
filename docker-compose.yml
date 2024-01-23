@@ -2,7 +2,7 @@ version: "3"
 services:
   nginx:
     restart: always
-    image: mine0702/docker-nginx
+    image: mine0702/beevarium_nginx
     container_name: app_nginx
     ports:
       - "80:80"
@@ -26,7 +26,7 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   frontend:
-    image: mine0702/docker-frontend
+    image: mine0702/beevarium_frontend
     container_name: app_frontend
     volumes:
       - /app/node_modules
@@ -35,7 +35,7 @@ services:
     mem_limit: 128m
 
   backend:
-    image: mine0702/docker-backend
+    image: mine0702/beevarium_backend
     container_name: app_backend
     volumes:
       - /app/node_modules
