@@ -8,7 +8,8 @@ services:
       - "80:80"
       - "443:443" # HTTPS 포트 추가
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt # SSL 인증서 볼륨 마운트
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./nginx-config:/etc/nginx/conf.d
     depends_on:
       - frontend
       - backend
