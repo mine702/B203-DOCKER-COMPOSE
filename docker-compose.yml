@@ -1,44 +1,57 @@
-version: "3"
+version: "3.8"
 services:
-  nginx:
-    restart: always
-    image: mine0702/beevarium_nginx
-    container_name: app_nginx
+  app:
+    image: "jc21/nginx-proxy-manager:latest"
+    restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443" # HTTPS 포트 추가
+      - "60081:81"
+      - "443:443"
+    environment:
+      # Mysql/Maria connection parameters:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB_MYSQL_NAME: "npm"
+      # Uncomment this if IPv6 is not enabled on your host
+      # DISABLE_IPV6: 'true'
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
     depends_on:
-      - frontend
-      - backend
-    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
+      - db
 
-  certbot:
-    container_name: certbot
-    image: certbot/certbot
+  db:
+    image: "jc21/mariadb-aria:latest"
     restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "npm"
+      MYSQL_DATABASE: "npm"
+      MYSQL_USER: "npm"
+      MYSQL_PASSWORD: "npm"
+      MARIADB_AUTO_UPGRADE: "1"
     volumes:
-      - /letsencrypt/certbot/conf:/etc/letsencrypt
-      - /letsencrypt/certbot/www:/var/www/certbot
-    depends_on:
-      - nginx
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+      - ./data/mysql:/var/lib/mysql
 
   frontend:
-    image: mine0702/beevarium_frontend
+    image: mine0702/beevarium-frontend
+    restart: unless-stopped
     container_name: app_frontend
-    volumes:
-      - /app/node_modules
-      - ./frontend:/app
+    expose:
+      - "3000"
     stdin_open: true
-    mem_limit: 128m
+    # mem_limit: 1024m
 
   backend:
-    image: mine0702/beevarium_backend
+    image: mine0702/beevarium-backend
+    restart: unless-stopped
     container_name: app_backend
-    volumes:
-      - /app/node_modules
-      - ./backend:/app
     stdin_open: true
-    mem_limit: 128m
+    expose:
+      - "8080" # 백엔드 서비스가 사용하는 포트, 외부에 노출하지 않음
+    # mem_limit: 1024m
+# networks:
+#   default:
+#     external:
+#       name: nginx-proxy
