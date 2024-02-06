@@ -4,7 +4,7 @@ services:
     image: "jc21/nginx-proxy-manager:latest"
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "60080:80"
       - "60081:81"
       - "60443:443"
     environment:
