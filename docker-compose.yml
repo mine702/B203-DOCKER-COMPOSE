@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
       - "60081:81"
-      - "443:443"
+      - "60443:443"
     environment:
       # Mysql/Maria connection parameters:
       DB_MYSQL_HOST: "db"
