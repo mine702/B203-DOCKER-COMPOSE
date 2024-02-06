@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     container_name: app_frontend
     expose:
-      - "3000"
+      - "4000"
     stdin_open: true
     # mem_limit: 1024m
 
