@@ -35,7 +35,7 @@ services:
       - ./data/mysql:/var/lib/mysql
 
   frontend:
-    image: mine0702/openvidu-test-front
+    image: mine0702/beevarium-frontend
     restart: unless-stopped
     container_name: app_frontend
     expose:
